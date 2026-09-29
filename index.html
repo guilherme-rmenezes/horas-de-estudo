@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Horas de estudo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <p class="brand">Horas de estudo</p>
+  <div id="warn" class="banner" hidden>Este navegador bloqueou o armazenamento local. Os dados valem só até fechar a página. Use o backup abaixo para não perder o histórico.</div>
+
+  <header>
+    <p class="total" id="total" aria-live="polite">0h 00min</p>
+    <div class="rankrow">
+      <span class="chip" id="rankChip">Nível 0 · Latente</span>
+      <p class="note" id="gNote"></p>
+    </div>
+    <div class="power big" id="gBar" role="progressbar" aria-label="Progresso do nível geral" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div>
+    <dl class="stats">
+      <div><dt>hoje</dt><dd id="stToday">0min</dd></div>
+      <div><dt>nesta semana</dt><dd id="stWeek">0min</dd></div>
+      <div><dt>dias seguidos</dt><dd id="stStreak">0</dd></div>
+    </dl>
+  </header>
+
+  <main class="grid">
+    <div>
+      <section aria-labelledby="hReg">
+        <h2 id="hReg">Registrar estudo</h2>
+        <div class="panel">
+          <div class="tabs" role="tablist" aria-label="Forma de registrar">
+            <button role="tab" id="tabTimer" aria-selected="true" aria-controls="pTimer" data-tab="timer">Timer</button>
+            <button role="tab" id="tabManual" aria-selected="false" aria-controls="pManual" data-tab="manual">Já estudei</button>
+          </div>
+          <div class="picker" id="picker" role="radiogroup" aria-label="Matéria"></div>
+          <button type="button" class="btn quiet" id="addSubjBtn" style="margin:2px 0 14px">Nova matéria</button>
+          <div id="addSubjForm" hidden style="margin:0 0 14px">
+            <div class="fields">
+              <div class="full"><label for="newSubjName">Nome da matéria</label><input type="text" id="newSubjName" maxlength="40" placeholder="Ex.: Direito Constitucional"></div>
+            </div>
+            <label style="margin-top:10px">Cor</label>
+            <div class="swrow" id="newSubjColor" role="radiogroup" aria-label="Cor da matéria"></div>
+            <div class="actions" style="margin-top:10px">
+              <button class="btn primary" id="newSubjSave">Adicionar</button>
+              <button class="btn quiet" id="newSubjCancel">Cancelar</button>
+            </div>
+          </div>
+
+          <div id="pTimer" role="tabpanel" aria-labelledby="tabTimer">
+            <div class="clock" id="clock">00:00:00</div>
+            <p class="status" id="tStatus">Pronto para começar</p>
+            <div class="actions">
+              <button class="btn primary" id="tStart">Iniciar</button>
+              <button class="btn primary" id="tPause" hidden>Pausar</button>
+              <button class="btn" id="tSave" hidden>Salvar sessão</button>
+              <button class="btn quiet" id="tReset" hidden>Descartar</button>
+            </div>
+          </div>
+
+          <div id="pManual" role="tabpanel" aria-labelledby="tabManual" hidden>
+            <div class="fields">
+              <div class="full"><label for="mDate">Data</label><input type="date" id="mDate"></div>
+              <div><label for="mH">Horas</label><input type="number" id="mH" inputmode="numeric" min="0" max="24" step="1" placeholder="0"></div>
+              <div><label for="mM">Minutos</label><input type="number" id="mM" inputmode="numeric" min="0" max="59" step="1" placeholder="0"></div>
+            </div>
+            <div class="actions" style="margin-top:14px"><button class="btn primary" id="mAdd">Adicionar horas</button></div>
+          </div>
+          <p class="msg" id="msg" role="status"></p>
+        </div>
+      </section>
+
+      <section aria-labelledby="hSub">
+        <h2 id="hSub">Nível por matéria</h2>
+        <div id="subjects"></div>
+      </section>
+    </div>
+
+    <div>
+      <section aria-labelledby="hChart">
+        <h2 id="hChart">Evolução</h2>
+        <div class="panel">
+          <div class="chart-top">
+            <div class="tabs" role="tablist" aria-label="Período do gráfico" id="chartTabs">
+              <button role="tab" aria-selected="true" data-mode="day">Dia</button>
+              <button role="tab" aria-selected="false" data-mode="week">Semana</button>
+              <button role="tab" aria-selected="false" data-mode="month">Mês</button>
+            </div>
+            <span class="note" id="chartSum"></span>
+          </div>
+          <div class="chart" id="chart"></div>
+          <div class="legend" id="legend"></div>
+          <p class="readout" id="readout" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section aria-labelledby="hHist">
+        <h2 id="hHist">Histórico</h2>
+        <ul class="hist" id="hist"></ul>
+        <div class="row" id="histMoreRow" hidden><button class="btn quiet" id="histMore">Ver todas as sessões</button></div>
+      </section>
+
+      <section>
+        <details>
+          <summary>Backup e outro aparelho</summary>
+          <div class="inner">
+            <p class="small" style="margin-top:0">Os dados ficam só neste navegador. Para levar o histórico ao celular (ou ao computador), gere o código aqui, copie e cole no outro aparelho.</p>
+            <label for="codeOut" style="margin-top:14px">Código de backup deste aparelho</label>
+            <textarea id="codeOut" readonly placeholder="Toque em “Gerar código”"></textarea>
+            <div class="row">
+              <button class="btn" id="bGen">Gerar código</button>
+              <button class="btn" id="bCopy">Copiar</button>
+            </div>
+            <label for="codeIn">Colar código de outro aparelho</label>
+            <textarea id="codeIn" placeholder="Cole aqui o código gerado no outro aparelho"></textarea>
+            <div class="row">
+              <button class="btn primary" id="bMerge">Mesclar</button>
+              <button class="btn" id="bReplace">Substituir tudo</button>
+            </div>
+            <p class="small">Mesclar junta as sessões dos dois aparelhos sem duplicar. Uma sessão apagada num aparelho volta se ainda existir no outro. Substituir troca tudo daqui pelo conteúdo do código.</p>
+            <p class="msg" id="bMsg" role="status"></p>
+          </div>
+        </details>
+      </section>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
