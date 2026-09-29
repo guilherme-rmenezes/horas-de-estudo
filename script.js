@@ -489,4 +489,15 @@ $('bReplace').onclick=function(){
 /* ---------- Render geral ---------- */
 function renderAll(){renderHero();renderSubjects();renderChart();renderHistory();renderTimer();}
 renderAll();
+
+/* ---------- Relógio no cabeçalho ---------- */
+function updateHeaderClock(){
+  var d=new Date();
+  var dia=d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit'});
+  dia=dia.charAt(0).toUpperCase()+dia.slice(1);
+  var hora=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  $('liveClock').textContent=dia+' \u2022 '+hora;
+}
+updateHeaderClock();
+setInterval(updateHeaderClock,1000);
 })();
