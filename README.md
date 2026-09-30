@@ -27,9 +27,13 @@ Acesse em: https://guilherme-rmenezes.github.io/horas-de-estudo/
 
 ## Sistema de progressão
 
-O nível é calculado a partir do total de segundos estudados, em blocos fixos de 10 horas. A nomenclatura segue o sistema de elos do League of Legends: Ferro, Bronze, Prata, Ouro, Platina, Esmeralda e Diamante, cada um com 4 divisões, seguidos por Mestre, Grão Mestre e Desafiante, este último sem limite superior, incrementando indefinidamente conforme as horas aumentam.
+O aplicativo usa dois modelos de progresso separados, cada um com uma finalidade diferente.
 
-A função `tier(nivel)` traduz o índice do nível acumulado em nome e cor do elo correspondente, tanto para o total geral quanto para cada matéria isoladamente.
+Por matéria, o nível é calculado em blocos fixos de 10 horas, com uma nomenclatura de carreira: Onboarding, Fundamentos, Júnior I, Júnior II, Pleno I, Pleno II, Sênior I, Sênior II, Especialista e Autoridade. Cada nome corresponde a um bloco de 10 horas estudadas naquela matéria (Onboarding de 0 a 10h, Fundamentos de 10 a 20h, e assim por diante até Autoridade, de 90 a 100h). A partir de 100 horas na mesma matéria, a progressão continua sem limite, incrementando como Autoridade 2, Autoridade 3 e assim sucessivamente.
+
+O perfil geral não tem nomenclatura nem ranking, apenas um contador de nível simples: cada hora estudada, somando todas as matérias, equivale a 1 nível. Com 100 horas acumuladas, por exemplo, o total mostra 4 dias e 4 horas, e o nível geral marca 100.
+
+A função `tier(nivel)` traduz o índice do nível acumulado de uma matéria em nome e cor da etapa correspondente. O nível geral do perfil é calculado de forma separada, sem passar por essa função.
 
 ## Armazenamento de dados
 

@@ -1,22 +1,18 @@
 (function(){
 'use strict';
 var KEY='estudo-horas:v1';
-var BLOCK=36000; // 10h em segundos
-var ELOS=[
-  {n:'Ferro',c:'#5C5B57'},{n:'Bronze',c:'#8C5A2B'},{n:'Prata',c:'#9FA8B2'},{n:'Ouro',c:'#D4AF37'},
-  {n:'Platina',c:'#2FB8AC'},{n:'Esmeralda',c:'#1FA971'},{n:'Diamante',c:'#4C8DDB'}
+var BLOCK=36000; // 10h em segundos, usado no nível de cada matéria
+var GEN_BLOCK=3600; // 1h em segundos, usado no nível geral do perfil
+var CAREER=[
+  {n:'Onboarding',c:'#8A8F9E'},{n:'Fundamentos',c:'#5B8DEF'},{n:'Júnior I',c:'#34A0A4'},{n:'Júnior II',c:'#2E9E5B'},
+  {n:'Pleno I',c:'#6C5CE7'},{n:'Pleno II',c:'#9B59B6'},{n:'Sênior I',c:'#E08E45'},{n:'Sênior II',c:'#E0609A'},
+  {n:'Especialista',c:'#D64550'},{n:'Autoridade',c:'#F0B429'}
 ];
 var SUBJ_COLORS=['#1FA89A','#E0709A','#8C7AE6','#E39B2D','#4C8DDB','#7CB342','#D64550','#5B6ABF','#A0693D','#C0459E'];
 function tier(l){
-  var maxDiv=ELOS.length*4;
-  if(l<maxDiv){
-    var e=Math.floor(l/4),d=(l%4)+1;
-    return {name:ELOS[e].n+' '+d,c:ELOS[e].c,prism:false};
-  }
-  var top=l-maxDiv;
-  if(top===0) return {name:'Mestre',c:'#9B59B6',prism:false};
-  if(top===1) return {name:'Grão-Mestre',c:'#E5484D',prism:false};
-  return {name:'Desafiante '+(top-1),c:'#F5D76E',prism:true};
+  if(l<CAREER.length) return {name:CAREER[l].n,c:CAREER[l].c,prism:false};
+  var extra=l-CAREER.length+2;
+  return {name:'Autoridade '+extra,c:CAREER[CAREER.length-1].c,prism:true};
 }
 function $(id){return document.getElementById(id);}
 function pad(n){return String(n).padStart(2,'0');}
@@ -108,6 +104,14 @@ function nextNote(secs){
   var lv=Math.floor(secs/BLOCK),t=tier(lv),n=tier(lv+1),rem=BLOCK-(secs%BLOCK);
   return 'Nível '+lv+' · '+t.name+', faltam '+fmtHM(rem)+' para '+n.name;
 }
+function setGenPower(el,secs){
+  var frac=(secs%GEN_BLOCK)/GEN_BLOCK;
+  el.style.setProperty('--c','#5B8DEF');
+  el.style.removeProperty('--track');
+  el.classList.remove('prism');
+  el.firstElementChild.style.width=(frac*100).toFixed(2)+'%';
+  el.setAttribute('aria-valuenow',Math.round(frac*100));
+}
 function pulse(el){
   el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
   setTimeout(function(){el.classList.remove('pulse');},1100);
@@ -127,12 +131,11 @@ function renderHero(){
   $('total').innerHTML = d>0
     ? '<span>'+d+'</span><small>'+(d===1?'dia':'dias')+'</small> <span>'+h+'</span><small>h</small> <span>'+pad(m)+'</span><small>min</small>'
     : '<span>'+h+'</span><small>h</small> <span>'+pad(m)+'</span><small>min</small>';
-  var lv=Math.floor(secs/BLOCK),tr=tier(lv);
-  var chip=$('rankChip');chip.textContent='Nível '+lv+' · '+tr.name;
-  chip.style.background=tr.c;chip.style.color=ink(tr.c);
-  $('gNote').textContent='Faltam '+fmtHM(BLOCK-(secs%BLOCK))+' para '+tier(lv+1).name;
-  setPower($('gBar'),secs);
-  var root=document.documentElement.style;root.setProperty('--acc',tr.c);root.setProperty('--acc-ink',ink(tr.c));
+  var lv=Math.floor(secs/GEN_BLOCK);
+  var chip=$('rankChip');chip.textContent='Nível '+lv;
+  chip.style.removeProperty('background');chip.style.removeProperty('color');
+  $('gNote').textContent='Faltam '+fmtHM(GEN_BLOCK-(secs%GEN_BLOCK))+' para o nível '+(lv+1);
+  setGenPower($('gBar'),secs);
   var td=todayStr(),wk=ds(monday(new Date())),st=0,sw=0;
   S.entries.forEach(function(e){if(e.date===td) st+=e.secs; if(e.date>=wk) sw+=e.secs;});
   $('stToday').textContent=fmtHM(st);$('stWeek').textContent=fmtHM(sw);
@@ -320,8 +323,8 @@ function addEntry(subject,date,secs,source){
   S.entries.push({id:uid(),subject:subject,date:date,secs:secs,source:source,ts:Date.now()});
   save();renderAll();
   var after=totals(),msgs=[];
-  var gb=Math.floor(before.all/BLOCK),ga=Math.floor(after.all/BLOCK);
-  if(ga>gb){msgs.push('Nível geral '+ga+': '+tier(ga).name+'!');pulse($('gBar'));}
+  var gb=Math.floor(before.all/GEN_BLOCK),ga=Math.floor(after.all/GEN_BLOCK);
+  if(ga>gb){msgs.push('Nível geral '+ga+'!');pulse($('gBar'));}
   var sb=Math.floor(before[subject]/BLOCK),sa=Math.floor(after[subject]/BLOCK);
   if(sa>sb){
     msgs.push(subj(subject).name+' subiu para o nível '+sa+': '+tier(sa).name+'!');
