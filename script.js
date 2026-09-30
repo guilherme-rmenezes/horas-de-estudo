@@ -452,8 +452,14 @@ function toB64(str){var bytes=new TextEncoder().encode(str),bin='';bytes.forEach
 function fromB64(s){var bin=atob(s),bytes=Uint8Array.from(bin,function(c){return c.charCodeAt(0);});return new TextDecoder().decode(bytes);}
 function makeCode(){return 'ESTUDO1:'+toB64(JSON.stringify({v:1,subjects:S.subjects,entries:S.entries}));}
 function readCode(txt){
-  txt=(txt||'').trim();var json=txt;
-  if(txt.indexOf('ESTUDO1:')===0) json=fromB64(txt.slice(8).replace(/\s+/g,''));
+  txt=(txt||'');
+  var m=txt.match(/ESTUDO1:?/i),json;
+  if(m){
+    var body=txt.slice(m.index+m[0].length).replace(/[^A-Za-z0-9+/=]/g,'');
+    json=fromB64(body);
+  }else{
+    json=txt.trim();
+  }
   var d=JSON.parse(json);
   if(!d||!Array.isArray(d.entries)) throw new Error('formato');
   return normalize({subjects:d.subjects,entries:d.entries});
