@@ -122,8 +122,11 @@ function streak(){
   return n;
 }
 function renderHero(){
-  var t=totals(),secs=t.all,h=Math.floor(secs/3600),m=Math.floor((secs%3600)/60);
-  $('total').innerHTML='<span>'+h+'</span><small>h</small> <span>'+pad(m)+'</span><small>min</small>';
+  var t=totals(),secs=t.all;
+  var d=Math.floor(secs/86400),h=Math.floor((secs%86400)/3600),m=Math.floor((secs%3600)/60);
+  $('total').innerHTML = d>0
+    ? '<span>'+d+'</span><small>'+(d===1?'dia':'dias')+'</small> <span>'+h+'</span><small>h</small> <span>'+pad(m)+'</span><small>min</small>'
+    : '<span>'+h+'</span><small>h</small> <span>'+pad(m)+'</span><small>min</small>';
   var lv=Math.floor(secs/BLOCK),tr=tier(lv);
   var chip=$('rankChip');chip.textContent='Nível '+lv+' · '+tr.name;
   chip.style.background=tr.c;chip.style.color=ink(tr.c);
